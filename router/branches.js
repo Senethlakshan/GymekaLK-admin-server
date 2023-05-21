@@ -4,7 +4,7 @@ const authenticate = require('../middleware/authenticate');
 const Branch = require('../models/branchesmodel');
 
 // Create a branch
-router.post('/branches', authenticate, async (req, res) => {
+router.post('/branches', async (req, res) => {
   try {
     const { branchCode, location, openTime, closeTime, managerName } = req.body;
 
@@ -24,7 +24,7 @@ router.post('/branches', authenticate, async (req, res) => {
 });
 
 // Get all branches
-router.get('/branches', authenticate, async (req, res) => {
+router.get('/branches', async (req, res) => {
   try {
     const branches = await Branch.find();
     res.status(200).json({ branches });
@@ -35,7 +35,7 @@ router.get('/branches', authenticate, async (req, res) => {
 });
 
 // Update a branch
-router.put('/branches/:id', authenticate, async (req, res) => {
+router.put('/branches/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { branchCode, location, openTime, closeTime, managerName } = req.body;
@@ -57,8 +57,26 @@ router.put('/branches/:id', authenticate, async (req, res) => {
   }
 });
 
+// Delete all branches
+router.delete('/branches/deleteAll', async (req, res) => {
+  try {
+    const { branchIds } = req.body;
+
+    const result = await Branch.deleteMany({ _id: { $in: branchIds } });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'No branches found!' });
+    }
+
+    res.json({ message: 'Branches deleted successfully.' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Internal server error!' });
+  }
+});
+
 // Delete a branch
-router.delete('/branches/:id', authenticate, async (req, res) => {
+router.delete('/branches/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
