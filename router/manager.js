@@ -29,6 +29,56 @@ router.post('/manager/register', async (req, res) => {
   });
   
 
+  // Manager update
+router.put('/manager/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { username, email, password } = req.body;
+
+    const manager = await Manager.findByIdAndUpdate(
+      id,
+      { username, email, password },
+      { new: true }
+    );
+
+    if (!manager) {
+      return res.status(404).json({ error: 'Manager not found!' });
+    }
+
+    res.status(200).json({ message: 'Manager updated successfully!', manager });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Internal server error!' });
+  }
+});
+
+// Manager delete
+router.delete('/manager/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const manager = await Manager.findByIdAndDelete(id);
+    if (!manager) {
+      return res.status(404).json({ error: 'Manager not found!' });
+    }
+
+    res.status(200).json({ message: 'Manager deleted successfully!' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Internal server error!' });
+  }
+});
+
+// Get all managers
+router.get('/managers', async (req, res) => {
+  try {
+    const managers = await Manager.find();
+    res.status(200).json({ managers });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Internal server error!' });
+  }
+});
 
 // manager login
 router.post('/manager/login', async (req, res) => {
